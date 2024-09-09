@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "@/apis/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -66,14 +66,8 @@ const VerifyEmail: React.FC = () => {
     }
 
     try {
-      console.log("FormData:", userEmail, enteredOTP);
       setIsLoading(true);
-
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/verify-otp",
-        { email: userEmail, otp: enteredOTP }
-      );
-      console.log("verification successful!", response.data);
+      await api.post("/auth/verify-otp", { email: userEmail, otp: enteredOTP });
 
       setTimeout(() => {
         navigate("/login");

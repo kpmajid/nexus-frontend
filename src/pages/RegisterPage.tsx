@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import axios from "axios";
-
 import {
   isName,
   isEmail,
   isPasswordStrong,
   doPasswordsMatch,
 } from "../util/formValidations";
+import api from "@/apis/axiosInstance";
 
 interface RegisterFormData {
   name: string;
@@ -105,14 +104,9 @@ const RegisterPage: React.FC = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      console.log("data:", formData);
       setIsLoading(true);
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/auth/register",
-          formData
-        );
-        console.log("Registration successful!", response.data);
+        await api.post("/auth/register", formData);
         navigate("/verify-email", { state: { userEmail: formData.email } });
       } catch (error) {
         console.error("Error registering:", error);
