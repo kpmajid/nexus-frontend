@@ -65,6 +65,14 @@ const router = createBrowserRouter([
                 element: <Projects />,
               },
               {
+                path: "chats",
+                element: <Chats />,
+              },
+              {
+                path: "meet", //online meeting
+                element: <Meets />,
+              },
+              {
                 path: ":projectId",
                 element: <ProtectedProjectRoute />,
                 children: [

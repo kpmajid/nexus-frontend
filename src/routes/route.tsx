@@ -2,15 +2,14 @@ import { createBrowserRouter } from "react-router-dom";
 
 import App from "../App.tsx";
 import Home from "../pages/Home.tsx";
-import RegistrationPage from "../pages/RegistrationPage.tsx";
+import RegisterPage from "../pages/RegisterPage.tsx";
+import VerifyEmail from "../pages/VerifyEmail.tsx";
 import Login from "../pages/Login.tsx";
 import ForgotPassword from "../pages/ForgotPassword.tsx";
-// import Signup from "../pages/Signup.tsx";
-// import ForgotPassword from "../pages/ForgotPassword.tsx";
-// import OtpVerification from "../pages/OtpVerification.tsx";
-// import Projects from "../pages/Projects.tsx";
-// import ProjectDetails from "../pages/ProjectDetails.tsx";
 import NotFound from "../pages/NotFound.tsx";
+import ProtectedRoute from "@/components/ProtectedRoute.tsx";
+import Layout from "@/components/Layout.tsx";
+import Projects from "@/pages/Projects.tsx";
 
 const router = createBrowserRouter([
   {
@@ -23,37 +22,33 @@ const router = createBrowserRouter([
       },
       {
         path: "register",
-        element: <RegistrationPage />,
+        element: <RegisterPage />,
       },
       { path: "login", element: <Login /> },
+      { path: "verify-email", element: <VerifyEmail /> },
       { path: "forgot-password", element: <ForgotPassword /> },
-      // {
-      //   // element: <ProtectedRoute />, // Specify is user logined?
-      //   children: [
-      //     {
-      //       path: "projects",
-      //       //   element: <Projects />,
-      //     },
-      //     {
-      //       path: ":projectId",
-      //       // element: <ProtectedProjectRoute />,
-      //       children: [
-      //         {
-      //           path: "overview",
-      //           //   element: <ProjectDetails />,
-      //         },
-      //         {
-      //           path: "tasks",
-      //           //   element: <Tasks />,
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       path: "profile",
-      //       //   element: <Profile />,
-      //     },
-      //   ],
-      // },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            element: <Layout />,
+            children: [
+              {
+                path: "projects",
+                element: <Projects />,
+              },
+              {
+                path: "chats",
+                element: <div>Chats</div>,
+              },
+              {
+                path: "meet",
+                element: <div>Meets</div>,
+              },
+            ],
+          },
+        ],
+      },
       {
         path: "*",
         element: <NotFound />,

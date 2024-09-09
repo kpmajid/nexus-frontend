@@ -1,7 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { AppDispatch } from "../app/store";
+
+import { login } from "../app/features/auth/authSlice";
 
 import { isEmail, isPasswordStrong } from "@/util/formValidations";
+import { toast } from "react-toastify";
+
+import resendOTP from "@/util/resendOTP";
 
 interface LoginFormData {
   email: string;
@@ -28,6 +36,10 @@ const validateField = (
 };
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -55,7 +67,7 @@ const Login = () => {
     setErrors(validationErrors);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const validationErrors: LoginFormErrors = {};
 
@@ -70,14 +82,31 @@ const Login = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
+      setIsLoading(true);
       // Proceed with registration (e.g., API call)
-      console.log("Login successful!", formData);
-      // Reset form or redirect as needed
-      setFormData({
-        email: "",
-        password: "",
-      });
-      setErrors({});
+      console.log("data:", formData);
+      try {
+        await dispatch(login(formData)).unwrap();
+        toast.success("Login successful!");
+        navigate("/projects");
+      } catch (error: any) {
+        toast.error(error.message);
+        if (error.message === "email not verified") {
+          try {
+            toast.info("Resending OTP...");
+            await resendOTP(formData.email);
+            setTimeout(() => {
+              navigate("/verify-email", {
+                state: { userEmail: formData.email },
+              });
+            }, 2000);
+          } catch (otpError: any) {
+            toast.error(otpError.message);
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -135,8 +164,9 @@ const Login = () => {
             <button
               className="w-full py-2 text-white bg-black rounded"
               onClick={handleSubmit}
+              disabled={isLoading}
             >
-              Log In
+              {isLoading ? "Loging In..." : "Log In"}
             </button>
           </form>
           <p className="text-center text-gray-500">

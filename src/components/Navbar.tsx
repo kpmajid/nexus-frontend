@@ -3,7 +3,20 @@ import { Link } from "react-router-dom";
 import logo from "../assets/icosahedron.png";
 import { Button } from "@/components/ui/button";
 
+import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
+
+const SomeShit = () => {
+  return (
+    <div>
+      <Button>Logout</Button>
+    </div>
+  );
+};
+
 const Navbar = () => {
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
       <div className="px-8 flex h-14 max-w-screen-2xl items-center">
@@ -18,12 +31,18 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <Button asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/register">Register</Link>
-          </Button>
+          {isLoggedIn ? (
+            <SomeShit />
+          ) : (
+            <>
+              <Button asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>
