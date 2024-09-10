@@ -1,17 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface ProjectsState {
-  user: { id: string; name: string; email: string; token: string } | null;
-  isAuthenticated: boolean;
+  projects: [{ id: string; name: string; email: string; token: string }] | [];
 }
 
 const initialState: ProjectsState = {
-  user: null,
-  isAuthenticated: false,
+  projects: [],
 };
 
 export const projectsSlice = createSlice({
-  name: "auth",
+  name: "projects",
   initialState,
   reducers: {
     setProjects: () => {},

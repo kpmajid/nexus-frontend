@@ -20,11 +20,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await store.dispatch(refreshToken());
-        return api(originalRequest);
+        const action = await store.dispatch(refreshToken());
+
+        if (refreshToken.fulfilled.match(action)) {
+          console.log("in api intercepters resoinse:", action.payload);
+          const newToken = action.payload.token;
+          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+          return api(originalRequest);
+        } else {
+          throw new Error("Token refresh failed");
+        }
       } catch (refreshError) {
         // Handle refresh token failure (e.g., logout user)
         store.dispatch(logout());

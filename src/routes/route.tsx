@@ -7,9 +7,10 @@ import VerifyEmail from "../pages/VerifyEmail.tsx";
 import Login from "../pages/Login.tsx";
 import ForgotPassword from "../pages/ForgotPassword.tsx";
 import NotFound from "../pages/NotFound.tsx";
-import ProtectedRoute from "@/components/ProtectedRoute.tsx";
+import RequireAuth from "@/components/RequireAuth.tsx";
 import Layout from "@/components/Layout.tsx";
 import Projects from "@/pages/Projects.tsx";
+import ProjectLayout from "@/components/ProjectLayout/ProjectLayout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
       { path: "verify-email", element: <VerifyEmail /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       {
-        element: <ProtectedRoute />,
+        element: <RequireAuth />,
         children: [
           {
             element: <Layout />,
@@ -44,6 +45,16 @@ const router = createBrowserRouter([
               {
                 path: "meet",
                 element: <div>Meets</div>,
+              },
+            ],
+          },
+          {
+            path: ":id/",
+            element: <ProjectLayout />,
+            children: [
+              {
+                path: "overview",
+                // element: <Overview />,
               },
             ],
           },

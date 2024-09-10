@@ -87,7 +87,9 @@ const Login = () => {
       console.log("data:", formData);
       try {
         await dispatch(login(formData)).unwrap();
+
         toast.success("Login successful!");
+        
         navigate("/projects");
       } catch (error: any) {
         toast.error(error.message);
