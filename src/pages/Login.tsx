@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { AppDispatch } from "../app/store";
 
-import { login } from "../app/features/auth/authSlice";
+import { login } from "@/apis/authApi";
 
 import { isEmail, isPasswordStrong } from "@/util/formValidations";
 import { toast } from "react-toastify";
 
-import resendOTP from "@/util/resendOTP";
+import resendOTP from "@/apis/resendOTP";
+import { loginFulfilled } from "@/app/features/auth/authSlice";
+import useAuth from "@/hooks/useAuth";
 
 interface LoginFormData {
   email: string;
@@ -37,8 +39,21 @@ const validateField = (
 
 const Login = () => {
   const navigate = useNavigate();
+  const isLoggedIn = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Wait for isLoggedIn to be determined
+    if (isLoggedIn !== undefined) {
+      setLoading(false);
+      if (isLoggedIn) {
+        navigate("/projects");
+      }
+    }
+  }, [isLoggedIn, navigate]);
+
   const dispatch = useDispatch<AppDispatch>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isResLoading, setIsResLoading] = useState(false);
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -82,14 +97,16 @@ const Login = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      setIsLoading(true);
-      // Proceed with registration (e.g., API call)
-      console.log("data:", formData);
+      setIsResLoading(true);
+
       try {
-        await dispatch(login(formData)).unwrap();
+        const response = await login(formData);
+        console.log(response.data);
+        const { id, name, email, avatar } = response.data;
+        dispatch(loginFulfilled({ id, name, email, avatar }));
 
         toast.success("Login successful!");
-        
+
         navigate("/projects");
       } catch (error: any) {
         toast.error(error.message);
@@ -107,10 +124,14 @@ const Login = () => {
           }
         }
       } finally {
-        setIsLoading(false);
+        setIsResLoading(false);
       }
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
 
   return (
     <div className="container mx-auto px-8 relative">
@@ -166,9 +187,9 @@ const Login = () => {
             <button
               className="w-full py-2 text-white bg-black rounded"
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isResLoading}
             >
-              {isLoading ? "Loging In..." : "Log In"}
+              {isResLoading ? "Loging In..." : "Log In"}
             </button>
           </form>
           <p className="text-center text-gray-500">

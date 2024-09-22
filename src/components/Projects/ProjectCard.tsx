@@ -1,4 +1,6 @@
-const ProjectCard = ({ project }) => {
+import {Project} from '../../types/types'
+
+const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md w-80">
       <h2 className="text-xl font-bold mb-2">{project.title}</h2>

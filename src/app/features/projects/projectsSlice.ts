@@ -1,7 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Project } from "@/types/types";
 
 interface ProjectsState {
-  projects: [{ id: string; name: string; email: string; token: string }] | [];
+  projects: Project[];
 }
 
 const initialState: ProjectsState = {
@@ -12,8 +13,12 @@ export const projectsSlice = createSlice({
   name: "projects",
   initialState,
   reducers: {
-    setProjects: () => {},
-    addProject: () => {},
+    setProjects: (state, action: PayloadAction<Project[]>) => {
+      state.projects = action.payload;
+    },
+    addProject: (state, action: PayloadAction<Project>) => {
+      state.projects = [action.payload, ...state.projects];
+    },
   },
 });
 

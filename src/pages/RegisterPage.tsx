@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -8,6 +8,7 @@ import {
   doPasswordsMatch,
 } from "../util/formValidations";
 import api from "@/apis/axiosInstance";
+import useAuth from "@/hooks/useAuth";
 
 interface RegisterFormData {
   name: string;
@@ -39,6 +40,18 @@ const validateField = (
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const isLoggedIn = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Wait for isLoggedIn to be determined
+    if (isLoggedIn !== undefined) {
+      setLoading(false);
+      if (isLoggedIn) {
+        navigate("/projects");
+      }
+    }
+  }, [isLoggedIn, navigate]);
 
   const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
@@ -115,6 +128,11 @@ const RegisterPage: React.FC = () => {
       }
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
+
   return (
     <div className="container mx-auto px-8 relative">
       <div className="mx-auto flex flex-col items-center gap-2 px-4 py-8 md:py-12 md:pb-8 lg:py-12 lg:pb-10">

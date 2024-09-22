@@ -8,7 +8,7 @@ import {
 
 const Side = () => {
   return (
-    <div className="bg-gray-50 text-black h-screen p-6">
+    <div className="bg-gray-50 text-black h-screen p-4">
       <nav>
         <ul className="space-y-2">
           <li>

@@ -1,25 +1,74 @@
 /nexus_front-end
   /src
     /apis
-      loginAPI.tsx
-      registerAPI.tsx
+      authApi.ts
+      axiosInstance.ts
+      error.ts
+      ProjectApi.ts
+      resendOTP.ts
+      userApi.ts
     /app
       /features
         /auth
           authSlice.ts
-        /project
         /projects
           projectsSlice.ts
       store.ts
     /assets
     /components
+      /Navbar
+        AuthButtons.tsx
+        Logo.tsx
+        Navbar.tsx
+        NotificationMenu.tsx
+        UserDropdown.tsx
+        UserMenu.tsx
+      /Profile
+        ProfileAvatarSection.tsx
+        ProfileEmailSectioin.tsx
+        ProfileNameSection.tsx
+      /ProfileLayout
+        ProfileLayout.tsx
+        ProfileSidebar.tsx
+      /ProjectLayout
+        ProjectLayout.tsx
+        ProjectSidebar.tsx
+      /Projects
+        ProjectAdd.tsx
+        ProjectCard.tsx
+        ProjectsGrid.tsx
+        ProjectsTopBar.tsx
+      /Sidebar
       /ui
-      Layout.tsx //....other components
+        avatar.tsx
+        button.tsx
+        calender.tsx
+      Layout.tsx 
+      RegistrationForm.tsx
+      RequireAuth.tsx
+      Sidebar.ts
+    /hooks
+      useAuth.ts
+      useRefreshToken.ts
     /lib
+      utils.ts
     /pages
+      ForgotPassword.tsx
+      GenerallInformation.tsx
+      Home.tsx
       Login.tsx
-      NotFount.tsx //... and other pages
+      NotFount.tsx
+      OtpVerification.tsx
+      ProjectDetails.tsx
+      Projects.tsx
+      RegisterPage.tsx
+      VerifyEmail.tsx
     /routes
       route.tsx
+    /types
+      types.ts
     /util
       formValidations.ts
+    App.tsx
+    index.css
+    main.tsx

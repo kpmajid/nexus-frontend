@@ -12,6 +12,10 @@ import Layout from "@/components/Layout.tsx";
 import Projects from "@/pages/Projects.tsx";
 import ProjectLayout from "@/components/ProjectLayout/ProjectLayout.tsx";
 
+import ProfileLayout from "@/components/ProfileLayout/ProfileLayout.tsx";
+
+import GeneralInformation from "@/pages/GeneralInformation.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -45,6 +49,20 @@ const router = createBrowserRouter([
               {
                 path: "meet",
                 element: <div>Meets</div>,
+              },
+            ],
+          },
+          {
+            path: "profile",
+            element: <ProfileLayout />,
+            children: [
+              {
+                index: true,
+                element: <GeneralInformation />,
+              },
+              {
+                path: "change-password",
+                element: <div>change-password</div>,
               },
             ],
           },

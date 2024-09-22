@@ -1,4 +1,25 @@
+import useAuth from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 const ForgotPassword = () => {
+  const navigate = useNavigate();
+  const isLoggedIn = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Wait for isLoggedIn to be determined
+    if (isLoggedIn !== undefined) {
+      setLoading(false);
+      if (isLoggedIn) {
+        navigate("/projects");
+      }
+    }
+  }, [isLoggedIn, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
   return (
     <div className="container mx-auto px-8 relative">
       <div className="mx-auto flex flex-col items-center gap-2 px-4 py-8 md:py-12 md:pb-8 lg:py-12 lg:pb-10">
@@ -11,7 +32,7 @@ const ForgotPassword = () => {
             <div>
               <label className="block text-gray-700">Email</label>
               <input
-                type="email" 
+                type="email"
                 placeholder="Enter your email address"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
               />

@@ -2,26 +2,56 @@ import api from "@/apis/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import useAuth from "@/hooks/useAuth";
+import resendOTP from "@/apis/resendOTP";
+
 const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
+  const isLoggedIn = useAuth();
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const { userEmail } = location.state;
 
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!userEmail.length) {
-      navigate("/login");
-    }
-  }, [userEmail, navigate]);
-
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [resendTimer, setResendTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    // Wait for isLoggedIn to be determined
+    if (isLoggedIn !== undefined) {
+      setLoading(false);
+      if (isLoggedIn) {
+        navigate("/projects");
+      }
+    }
+  }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    if (!userEmail.length) {
+      navigate("/login");
+    }
+  }, []);
+
   useEffect(() => {
     inputRefs.current[0]?.focus();
   }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleChange = (value: string, index: number) => {
     if (!/^\d*$/.test(value)) return;
@@ -54,7 +84,22 @@ const VerifyEmail: React.FC = () => {
     inputRefs.current[5]?.focus();
   };
 
-  const handleResend = () => {};
+  const handleResend = async () => {
+    if (!canResend) return;
+
+    try {
+      setIsLoading(true);
+
+      await resendOTP(userEmail);
+
+      setResendTimer(60);
+      setCanResend(false);
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -79,6 +124,10 @@ const VerifyEmail: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
+
   return (
     <div className="container mx-auto px-8 relative">
       <div className="mx-auto flex flex-col items-center gap-2 px-4 py-8 md:py-12 md:pb-8 lg:py-12 lg:pb-10">
@@ -92,10 +141,13 @@ const VerifyEmail: React.FC = () => {
               <div className="flex justify-end mb-2 text-sm">
                 <button
                   type="button"
-                  className="text-blue-500"
+                  className={`text-blue-500 ${
+                    !canResend && "opacity-50 cursor-not-allowed"
+                  }`}
                   onClick={handleResend}
+                  disabled={!canResend}
                 >
-                  Re-send Code
+                  {canResend ? "Re-send OTP" : `Re-send OTP (${resendTimer}s)`}
                 </button>
               </div>
               <div className=" mb-6">
