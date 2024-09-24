@@ -38,14 +38,14 @@ const ProjectSidebar: React.FC = () => {
 
         if (response && response.data) {
           const projectDetails = response.data.projectDetails;
+
           const role =
-            projectDetails.teamLead === currentUser?.id
+            projectDetails.teamLead._id === currentUser?.id
               ? "teamLead"
               : "teamMember";
 
           dispatch(setProjectDetails(projectDetails));
           dispatch(setUserRole(role));
-          console.log(response);
         }
       } catch (error) {
         console.log(error);

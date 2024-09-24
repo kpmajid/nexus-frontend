@@ -40,9 +40,34 @@ export const createProject = async (projectDetails: {
 
 export const fetchProjectDetails = async (id: string) => {
   try {
-    console.log("fetchProjectDetails");
     const response = await api.get(`/projects/${id}`);
-    console.log(response)
+
+    return response;
+  } catch (error) {
+    const err: Error = error as Error;
+    return errorHandle(err);
+  }
+};
+
+export const editProject = async ({
+  projectId,
+  title,
+  description,
+  startDate,
+  endDate,
+}: {
+  projectId: string;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+}) => {
+  try {
+    const projectDetails = { title, description, startDate, endDate };
+    console.log(projectDetails, "projectDetails");
+    console.log(projectId, "projectId");
+    const response = await api.put(`/projects/${projectId}`, projectDetails);
+    console.log(response);
     return response;
   } catch (error) {
     const err: Error = error as Error;

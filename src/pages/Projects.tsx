@@ -16,7 +16,6 @@ const Projects = () => {
     const loadProjects = async () => {
       try {
         const response = await fetchProjects();
-        console.log(response,"inload");
         if (response) {
           dispatch(setProjects(response.data.projects));
         }

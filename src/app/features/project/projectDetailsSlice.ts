@@ -16,7 +16,6 @@ export const projectDetailsSlice = createSlice({
   initialState,
   reducers: {
     setProjectDetails: (state, action: PayloadAction<Project>) => {
-      console.log(action.payload, "action.payload");
       state.project = action.payload;
     },
     setUserRole: (state, action: PayloadAction<"teamLead" | "teamMember">) => {
