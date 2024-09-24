@@ -37,3 +37,15 @@ export const createProject = async (projectDetails: {
     return errorHandle(err);
   }
 };
+
+export const fetchProjectDetails = async (id: string) => {
+  try {
+    console.log("fetchProjectDetails");
+    const response = await api.get(`/projects/${id}`);
+    console.log(response)
+    return response;
+  } catch (error) {
+    const err: Error = error as Error;
+    return errorHandle(err);
+  }
+};

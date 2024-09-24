@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,19 +16,24 @@ import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "../ui/calendar";
 import { createProject } from "@/apis/projectApi";
 import { toast } from "react-toastify";
 
 import { useNavigate } from "react-router-dom";
-import { AppDispatch } from "@/app/store";
-import { useDispatch } from "react-redux";
+import DatePicker from "./DatePicker";
+// import { AppDispatch } from "@/app/store";
+// import { useDispatch } from "react-redux";
+
+interface Errors {
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}
 
 const ProjectAdd = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  // const dispatch = useDispatch<AppDispatch>();
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -38,22 +41,18 @@ const ProjectAdd = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<Errors>({
     title: "",
     description: "",
     startDate: "",
     endDate: "",
   });
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
+  const handleProjectAdd = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ): Promise<void> => {
+    e.preventDefault();
 
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
-
-  const handleProjectAdd = async (e) => {
     setErrors({
       title: "",
       description: "",
@@ -91,16 +90,14 @@ const ProjectAdd = () => {
     }
 
     try {
-      const formatedStartDate = new Date(startDate);
-      const formatedEndDate = new Date(endDate);
-      console.log(title, description, startDate, endDate);
       const response = await createProject({
         title,
         description,
-        startDate: formatedStartDate,
-        endDate: formatedEndDate,
+        startDate: new Date(startDate!),
+        endDate: new Date(endDate!),
       });
-      console.log(response.data);
+
+      console.log(response?.data);
       // dispatch(addProject());
 
       toast.success("new project added!");
@@ -125,113 +122,44 @@ const ProjectAdd = () => {
         <DialogHeader>
           <DialogTitle>Create Project</DialogTitle>
         </DialogHeader>
-        <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
+        <div className="grid gap-4">
+          <div className="grid gap-2">
             <Label htmlFor="title">Name</Label>
             <Input
               id="title"
-              placeholder="enter project title"
+              placeholder="Enter project title"
               value={title}
-              onChange={handleTitleChange}
+              onChange={(e) => setTitle(e.target.value)}
             />
             {errors.title && (
-              <p className="text-sm text-muted-foreground text-red-500 ">
-                {errors.title}
-              </p>
+              <p className="text-sm text text-red-500 ">{errors.title}</p>
             )}
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
+          <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Enter Description."
+              placeholder="Enter description"
               value={description}
-              onChange={handleDescriptionChange}
+              onChange={(e) => setDescription(e.target.value)}
             />
             {errors.description && (
-              <p className="text-sm text-muted-foreground text-red-500 ">
-                {errors.description}
-              </p>
+              <p className="text-sm text-red-500 ">{errors.description}</p>
             )}
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="invite">Invite</Label>
-            <Input id="invite" placeholder="Enter email id" />
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="start-date">Start Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !startDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? (
-                    format(startDate, "PPP")
-                  ) : (
-                    <span>Pick start date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              {errors.startDate && (
-                <p className="text-sm text-muted-foreground text-red-500 ">
-                  {errors.startDate}
-                </p>
-              )}
-
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={setStartDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="start-date">End Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !endDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? (
-                    format(endDate, "PPP")
-                  ) : (
-                    <span>Pick end date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              {errors.endDate && (
-                <p className="text-sm text-muted-foreground text-red-500 ">
-                  {errors.endDate}
-                </p>
-              )}
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={setEndDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <DatePicker
+              label="Start Date"
+              date={startDate}
+              setDate={setStartDate}
+              error={errors.startDate}
+            />
+            <DatePicker
+              label="End Date"
+              date={endDate}
+              setDate={setEndDate}
+              error={errors.endDate}
+            />
           </div>
         </div>
         <DialogFooter className="sm:justify-end">

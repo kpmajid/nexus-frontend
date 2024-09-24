@@ -37,3 +37,47 @@ export const refreshAccessToken = async () => {
     // return errorHandle(err);
   }
 };
+
+export const resetPassword = async (email: string) => {
+  try {
+    const response = await api.post("/auth/forgot-password", { email });
+    if (response.status === 200 && response.data) {
+      return {
+        success: true,
+        message: "Email send successfully",
+        user: response.data.user,
+      };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
+  } catch (error) {
+    const err: Error = error as Error;
+    console.log(err);
+  }
+};
+
+export const resetPasswordWithToken = async (
+  token: string,
+  password: string
+) => {
+  try {
+    console.log(token,password, "in reset ooass")
+    const response = await api.post("/auth/reset-password", {
+      token,
+      password,
+    });
+
+    if (response.status === 200 && response.data) {
+      return {
+        success: true,
+        message: "Password updated successfully",
+        user: response.data.user,
+      };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
+  } catch (error) {
+    const err: Error = error as Error;
+    console.log(err);
+  }
+};

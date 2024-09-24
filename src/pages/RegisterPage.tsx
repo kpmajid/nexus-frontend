@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -120,9 +121,11 @@ const RegisterPage: React.FC = () => {
       setIsLoading(true);
       try {
         await api.post("/auth/register", formData);
+        toast.success("Check you mail for OTP,");
+
         navigate("/verify-email", { state: { userEmail: formData.email } });
       } catch (error) {
-        console.error("Error registering:", error);
+        toast.error(error?.response?.data.message);
       } finally {
         setIsLoading(false);
       }
@@ -130,7 +133,11 @@ const RegisterPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Or a spinner component
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
   }
 
   return (

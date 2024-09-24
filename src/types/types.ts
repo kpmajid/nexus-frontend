@@ -1,11 +1,21 @@
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+  isVerified: boolean;
+  refreshToken?: string;
+  avatar: string;
+}
+
 export interface Project {
   _id: string;
   title: string;
   description: string;
-  creator: string;
   status: string;
-  members: { avatar: string }[];
-  progress: number;
+  teamLead:  User;
+  teamMembers: ({ avatar: string } | User)[];
   startDate: string;
   endDate: string;
+  updatedAt?: string;
 }

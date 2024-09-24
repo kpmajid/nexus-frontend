@@ -28,9 +28,7 @@ const ProfileAvatarSection: React.FC = () => {
     setError(null);
     try {
       const result = await updateAvatar(file);
-      console.log(result);
       const avatar = result.user.avatar;
-      console.log(avatar, "avatar:?");
       dispatch(updateAvatarInSlice(avatar));
       setAvatarSrc(avatar);
     } catch (err) {

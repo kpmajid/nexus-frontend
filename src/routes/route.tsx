@@ -15,6 +15,9 @@ import ProjectLayout from "@/components/ProjectLayout/ProjectLayout.tsx";
 import ProfileLayout from "@/components/ProfileLayout/ProfileLayout.tsx";
 
 import GeneralInformation from "@/pages/GeneralInformation.tsx";
+import Overview from "@/pages/Overview.tsx";
+import ResetPassword from "@/pages/ResetPassword.tsx";
+import ProfileChangePasswordSection from "@/components/Profile/ProfileChangePasswordSection.tsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +35,7 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "verify-email", element: <VerifyEmail /> },
       { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
       {
         element: <RequireAuth />,
         children: [
@@ -62,7 +66,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "change-password",
-                element: <div>change-password</div>,
+                element: <ProfileChangePasswordSection />,
               },
             ],
           },
@@ -71,8 +75,8 @@ const router = createBrowserRouter([
             element: <ProjectLayout />,
             children: [
               {
-                path: "overview",
-                // element: <Overview />,
+                index: true,
+                element: <Overview />,
               },
             ],
           },

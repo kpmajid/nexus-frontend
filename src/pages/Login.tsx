@@ -130,7 +130,11 @@ const Login = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Or a spinner component
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
   }
 
   return (
@@ -177,12 +181,12 @@ const Login = () => {
               )}
             </div>
             <div className="text-center">
-              <a
-                href="/forgot-password"
+              <Link
+                to="/forgot-password"
                 className="text-black font-semibold underline"
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
             <button
               className="w-full py-2 text-white bg-black rounded"

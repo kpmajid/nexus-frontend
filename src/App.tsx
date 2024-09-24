@@ -24,14 +24,18 @@ export default function App() {
   }, [isLoggedIn, navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col flex-1 bg-neutral-100">
+    <div className="flex flex-col h-screen bg-neutral-100">
       <Navbar />
       <ToastContainer />
-      <main className="flex-1 ">
+      <main className="flex-grow">
         <Outlet />
       </main>
     </div>

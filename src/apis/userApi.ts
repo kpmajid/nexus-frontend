@@ -109,3 +109,26 @@ export const verifyEmailChangeOTP = async (email: string, otp: string) => {
     };
   }
 };
+
+export const updatePassword = async (password: string) => {
+  try {
+    const response = await api.put("/users/profile/password", {
+      password,
+    });
+    if (response.status === 200 && response.data) {
+      return {
+        success: true,
+        message: "Password updated successfully",
+        user: response.data.user,
+      };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
+  } catch (error) {
+    errorHandle(error as Error | AxiosError);
+    return {
+      success: false,
+      message: "Failed to Change password",
+    };
+  }
+};

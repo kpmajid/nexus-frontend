@@ -9,15 +9,15 @@ const Navbar = () => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      <div className="px-8 flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex">
+    <header className="bg-white shadow-sm">
+      <nav className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center">
           <Logo />
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+        <div className="flex items-center space-x-4">
           {isLoggedIn ? <UserMenu /> : <AuthButtons />}
         </div>
-      </div>
+      </nav>
     </header>
   );
 };
