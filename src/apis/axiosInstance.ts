@@ -4,7 +4,7 @@ import { logout, refreshAccessToken } from "./authApi";
 import { logoutFulfilled } from "@/app/features/auth/authSlice";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "http://localhost:3001/api",
   withCredentials: true,
 });
 

@@ -11,7 +11,8 @@ export const login = async (credentials: {
     return response;
   } catch (error) {
     const err: Error = error as Error;
-    return errorHandle(err);
+    errorHandle(err);
+    return null 
   }
 };
 

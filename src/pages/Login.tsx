@@ -101,26 +101,31 @@ const Login = () => {
 
       try {
         const response = await login(formData);
-        console.log(response.data);
-        const { id, name, email, avatar } = response.data;
-        dispatch(loginFulfilled({ id, name, email, avatar }));
+        if (response && response.data) {
+          console.log(response.data);
+          const { id, name, email, avatar } = response.data;
+          dispatch(loginFulfilled({ id, name, email, avatar }));
 
-        toast.success("Login successful!");
-
-        navigate("/projects");
-      } catch (error: any) {
-        toast.error(error.message);
-        if (error.message === "email not verified") {
-          try {
-            toast.info("Resending OTP...");
-            await resendOTP(formData.email);
-            setTimeout(() => {
-              navigate("/verify-email", {
-                state: { userEmail: formData.email },
-              });
-            }, 2000);
-          } catch (otpError: any) {
-            toast.error(otpError.message);
+          toast.success("Login successful!");
+          navigate("/projects");
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+          if (error.message === "email not verified") {
+            try {
+              toast.info("Resending OTP...");
+              await resendOTP(formData.email);
+              setTimeout(() => {
+                navigate("/verify-email", {
+                  state: { userEmail: formData.email },
+                });
+              }, 2000);
+            } catch (otpError: unknown) {
+              if (otpError instanceof Error) {
+                toast.error(otpError.message);
+              }
+            }
           }
         }
       } finally {
