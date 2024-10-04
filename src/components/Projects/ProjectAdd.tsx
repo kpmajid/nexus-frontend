@@ -101,7 +101,7 @@ const ProjectAdd = () => {
       // dispatch(addProject());
 
       toast.success("new project added!");
-      navigate("/projects");
+      navigate(`/${response.data._id}`);
     } catch (error) {
       console.error(error);
     }

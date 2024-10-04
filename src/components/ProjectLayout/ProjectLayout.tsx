@@ -12,4 +12,3 @@ const ProjectLayout = () => {
   );
 }
 export default ProjectLayout
-

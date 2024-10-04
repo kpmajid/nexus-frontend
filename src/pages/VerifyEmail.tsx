@@ -1,9 +1,12 @@
-import api from "@/apis/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import useAuth from "@/hooks/useAuth";
 import resendOTP from "@/apis/resendOTP";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { verifyOtp } from "@/apis/authApi";
+
+import { toast } from "react-toastify";
 
 const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +38,7 @@ const VerifyEmail: React.FC = () => {
     if (!userEmail.length) {
       navigate("/login");
     }
-  }, []);
+  }, [navigate, userEmail.length]);
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
@@ -112,7 +115,8 @@ const VerifyEmail: React.FC = () => {
 
     try {
       setIsLoading(true);
-      await api.post("/auth/verify-otp", { email: userEmail, otp: enteredOTP });
+      await verifyOtp(userEmail, enteredOTP);
+      toast.success("Verified successfully");
 
       setTimeout(() => {
         navigate("/login");
@@ -124,13 +128,7 @@ const VerifyEmail: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">

@@ -21,6 +21,7 @@ import {
 import { RootState } from "@/app/store";
 
 import ProjectSelect from "./ProjectSelect";
+import LoadingSpinner from "../LoadingSpinner";
 
 const ProjectSidebar: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,9 +56,7 @@ const ProjectSidebar: React.FC = () => {
     fetchProject();
   }, [id, dispatch, currentUser]);
 
-  if (!project) {
-    return <div>Loading...</div>; // Or any loading indicator
-  }
+  if (!project) return <LoadingSpinner />;
 
   return (
     <div className="bg-gray-50 text-black h-screen p-4">

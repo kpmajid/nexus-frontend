@@ -12,7 +12,7 @@ export const login = async (credentials: {
   } catch (error) {
     const err: Error = error as Error;
     errorHandle(err);
-    return null 
+    return null;
   }
 };
 
@@ -35,7 +35,7 @@ export const refreshAccessToken = async () => {
   } catch (error) {
     const err: Error = error as Error;
     console.log(err);
-    // return errorHandle(err);
+    return errorHandle(err);
   }
 };
 
@@ -54,6 +54,7 @@ export const resetPassword = async (email: string) => {
   } catch (error) {
     const err: Error = error as Error;
     console.log(err);
+    errorHandle(err);
   }
 };
 
@@ -62,7 +63,7 @@ export const resetPasswordWithToken = async (
   password: string
 ) => {
   try {
-    console.log(token,password, "in reset ooass")
+    console.log(token, password, "in reset ooass");
     const response = await api.post("/auth/reset-password", {
       token,
       password,
@@ -80,5 +81,24 @@ export const resetPasswordWithToken = async (
   } catch (error) {
     const err: Error = error as Error;
     console.log(err);
+    return errorHandle(err);
+  }
+};
+
+export const verifyOtp = async (email: string, otp: string) => {
+  try {
+    const response = await api.post("/auth/verify-otp", { email, otp });
+    if (response.status === 200 && response.data) {
+      return {
+        success: true,
+        message: "Email verified Successfully.",
+      };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
+  } catch (error) {
+    const err: Error = error as Error;
+    console.log(err);
+    return errorHandle(err);
   }
 };

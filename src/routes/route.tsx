@@ -15,9 +15,10 @@ import ProjectLayout from "@/components/ProjectLayout/ProjectLayout.tsx";
 import ProfileLayout from "@/components/ProfileLayout/ProfileLayout.tsx";
 
 import GeneralInformation from "@/pages/GeneralInformation.tsx";
-import Overview from "@/pages/Overview.tsx";
+import ProjectOverview from "@/components/Project/ProjectOverview.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
 import ProfileChangePasswordSection from "@/components/Profile/ProfileChangePasswordSection.tsx";
+import ProjectMembers from "@/components/Project/ProjectMembers/ProjectMembers.tsx";
 
 const router = createBrowserRouter([
   {
@@ -76,7 +77,11 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <Overview />,
+                element: <ProjectOverview />,
+              },
+              {
+                path: "members",
+                element: <ProjectMembers />,
               },
             ],
           },

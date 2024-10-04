@@ -1,20 +1,20 @@
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { resetPassword } from "@/apis/authApi";
 import useAuth from "@/hooks/useAuth";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const isLoggedIn = useAuth();
   const [email, setEmail] = useState("");
   const [validationError, setValidationError] = useState("");
-
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Wait for isLoggedIn to be determined
     if (isLoggedIn !== undefined) {
       setLoading(false);
       if (isLoggedIn) {
@@ -44,28 +44,23 @@ const ForgotPassword = () => {
       setValidationError(error);
       return;
     }
+
+    setIsSubmitting(true);
     try {
       const result = await resetPassword(email);
       if (result?.success) {
         console.log("sucess");
         toast.success("Check your Email!");
         setTimeout(() => navigate("/login"), 2000);
-      } else {
-        setValidationError("Failed to update name. Please try again.");
       }
-    } catch (err) {
-      console.log(err);
-      toast.error(err.message);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">
@@ -91,15 +86,15 @@ const ForgotPassword = () => {
             </div>
             <button
               className={`${
-                validationError
+                validationError || isSubmitting
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-black hover:bg-slate-900"
               } text-white rounded-md px-4 py-2 transition duration-300`}
               type="button"
               onClick={handleSubmit}
-              disabled={!!validationError}
+              disabled={!!validationError || isSubmitting}
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </form>
         </div>

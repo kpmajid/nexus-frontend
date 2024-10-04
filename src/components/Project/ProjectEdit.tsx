@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 
 import { Pencil } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +22,8 @@ import { toast } from "react-toastify";
 import DatePicker from "../Projects/DatePicker";
 import { editProject } from "@/apis/projectApi";
 
+import { AxiosResponse } from "axios";
+
 interface Errors {
   title: string;
   description: string;
@@ -31,21 +32,16 @@ interface Errors {
 }
 
 const ProjectEdit = () => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { project } = useSelector((state: RootState) => state.projectDetails);
 
   // const dispatch = useDispatch<AppDispatch>();
 
-  const [title, setTitle] = useState<string>(project?.title || "");
-  const [description, setDescription] = useState<string>(
-    project?.description || ""
-  );
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
-  const [startDate, setStartDate] = useState<Date | null>(
-    project?.startDate ? new Date(project.startDate) : null
-  );
-  const [endDate, setEndDate] = useState<Date | null>(
-    project?.endDate ? new Date(project.endDate) : null
-  );
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const [errors, setErrors] = useState<Errors>({
     title: "",
@@ -54,9 +50,16 @@ const ProjectEdit = () => {
     endDate: "",
   });
 
-  const handleProjectSave = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ): Promise<void> => {
+  useEffect(() => {
+    if (isEditDialogOpen && project) {
+      setTitle(project.title || "");
+      setDescription(project.description || "");
+      setStartDate(project.startDate ? new Date(project.startDate) : undefined);
+      setEndDate(project.endDate ? new Date(project.endDate) : undefined);
+    }
+  }, [isEditDialogOpen, project]);
+
+  const handleProjectSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
     setErrors({
@@ -96,21 +99,23 @@ const ProjectEdit = () => {
     }
 
     try {
-      if (!project) {
+      if (!project || !startDate || !endDate) {
         return;
       }
-      
-      const response = await editProject({
+
+      const response: AxiosResponse | void = await editProject({
         projectId: project._id,
         title,
         description,
-        startDate: new Date(startDate!),
-        endDate: new Date(endDate!),
+        startDate,
+        endDate,
       });
 
-      if (response.data) {
+      if (response && "data" in response) {
         // dispatch(updateProject(response.data));
         toast.success("Project updated successfully!");
+        setIsEditDialogOpen(false);
+        
       }
     } catch (error) {
       console.error(error);
@@ -119,19 +124,25 @@ const ProjectEdit = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Pencil className="h-4 w-4" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center"
+          onClick={() => setIsEditDialogOpen(true)}
+        >
+          <Pencil className="h-4 w-4 mr-2" />
+          Edit Project
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Edit Project</DialogTitle>
+          <DialogTitle>Edit Project: {project?.title}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4">
+        <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">Name</Label>
+            <Label htmlFor="title">Project Name</Label>
             <Input
               id="title"
               placeholder="Enter project title"
@@ -139,32 +150,33 @@ const ProjectEdit = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
             {errors.title && (
-              <p className="text-sm text text-red-500 ">{errors.title}</p>
+              <p className="text-sm text-destructive ">{errors.title}</p>
             )}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Enter description"
+              placeholder="Enter project description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[100px] resize-y"
             />
             {errors.description && (
-              <p className="text-sm text-red-500 ">{errors.description}</p>
+              <p className="text-sm text-destructive ">{errors.description}</p>
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <DatePicker
               label="Start Date"
               date={startDate}
-              setDate={setStartDate}
+              setDate={(date) => setStartDate(date)}
               error={errors.startDate}
             />
             <DatePicker
               label="End Date"
               date={endDate}
-              setDate={setEndDate}
+              setDate={(date) => setEndDate(date)}
               error={errors.endDate}
             />
           </div>

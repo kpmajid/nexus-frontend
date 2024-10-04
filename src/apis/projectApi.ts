@@ -1,23 +1,47 @@
+import { AxiosError } from "axios";
 import api from "./axiosInstance";
-import errorHandle from "./error";
+import errorHandle, { ApiError } from "./error";
 
-export const searchUser = async (email?: string) => {
+interface ApiResponse<T> {
+  data?: T;
+  error?: ApiError;
+}
+
+interface ProjectDetails {
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface EditProjectParams extends ProjectDetails {
+  projectId: string;
+}
+
+export const searchUsers = async (query: string) => {
   try {
-    const response = await api.get(`/users/search?email=${email}`);
-    return response;
+    console.log(query);
+    const response = await api.get(
+      `/users/search?query=${encodeURIComponent(query)}`
+    );
+    console.log(response.data)
+    return { data: response.data };
+    
   } catch (error) {
-    const err: Error = error as Error;
-    return errorHandle(err);
+    const apiError = errorHandle(error as Error | AxiosError);
+    return { error: apiError };
   }
 };
 
-export const fetchProjects = async () => {
+export const fetchProjects = async (): Promise<
+  ApiResponse<ProjectDetails[]>
+> => {
   try {
     const response = await api.get("/projects");
-    return response;
+    return { data: response.data.projects };
   } catch (error) {
-    const err: Error = error as Error;
-    return errorHandle(err);
+    const apiError = errorHandle(error as Error | AxiosError);
+    return { error: apiError };
   }
 };
 
@@ -29,12 +53,10 @@ export const createProject = async (projectDetails: {
 }) => {
   try {
     const response = await api.post("/projects", projectDetails);
-    console.log(response);
-    localStorage.setItem("accessToken", response.data.token);
-    return response;
+    return { data: response.data.project };
   } catch (error) {
-    const err: Error = error as Error;
-    return errorHandle(err);
+    const apiError = errorHandle(error as Error | AxiosError);
+    return { error: apiError };
   }
 };
 
@@ -55,20 +77,27 @@ export const editProject = async ({
   description,
   startDate,
   endDate,
-}: {
-  projectId: string;
-  title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-}) => {
+}: EditProjectParams) => {
   try {
-    const projectDetails = { title, description, startDate, endDate };
-    console.log(projectDetails, "projectDetails");
-    console.log(projectId, "projectId");
+    const projectDetails: ProjectDetails = {
+      title,
+      description,
+      startDate,
+      endDate,
+    };
     const response = await api.put(`/projects/${projectId}`, projectDetails);
     console.log(response);
     return response;
+  } catch (error) {
+    const err: Error = error as Error;
+    return errorHandle(err);
+  }
+};
+
+export const deleteProject = async (projectId: string) => {
+  try {
+    const response = await api.delete(`/projects/${projectId}`);
+    return { data: response.data };
   } catch (error) {
     const err: Error = error as Error;
     return errorHandle(err);
