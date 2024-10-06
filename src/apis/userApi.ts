@@ -132,3 +132,24 @@ export const updatePassword = async (password: string) => {
     };
   }
 };
+
+export const fetchNotifications = async () => {
+  try {
+    const response = await api.get("/users/notifications");
+    if (response.status === 200 && response.data) {
+      return {
+        success: true,
+        message: "Notification fetched successfully",
+        user: response.data.user,
+      };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
+  } catch (error) {
+    errorHandle(error as Error | AxiosError);
+    return {
+      success: false,
+      message: "Failed to fetch notifications",
+    };
+  }
+};
