@@ -1,35 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
+import { RootState } from "@/app/store";
 import { resetPassword } from "@/apis/authApi";
-import useAuth from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuth();
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
   const [email, setEmail] = useState("");
   const [validationError, setValidationError] = useState("");
-  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn !== undefined) {
-      setLoading(false);
-      if (isLoggedIn) {
-        navigate("/projects");
-      }
+    if (isLoggedIn) {
+      navigate("/projects");
     }
   }, [isLoggedIn, navigate]);
 
-  const validateEmail = useCallback((email: string) => {
+  const validateEmail = (email: string): string => {
     if (!email.trim()) {
       return "Email is required";
     }
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email) ? "" : "Invalid email address";
-  }, []);
+  };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
@@ -55,12 +53,13 @@ const ForgotPassword = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to send reset password email. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (isLoggedIn === undefined) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">

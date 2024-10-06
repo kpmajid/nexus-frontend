@@ -1,6 +1,9 @@
-import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
+import { RootState } from "@/app/store";
 
 import {
   isName,
@@ -9,7 +12,6 @@ import {
   doPasswordsMatch,
 } from "../util/formValidations";
 import api from "@/apis/axiosInstance";
-import useAuth from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface RegisterFormData {
@@ -42,18 +44,7 @@ const validateField = (
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Wait for isLoggedIn to be determined
-    if (isLoggedIn !== undefined) {
-      setLoading(false);
-      if (isLoggedIn) {
-        navigate("/projects");
-      }
-    }
-  }, [isLoggedIn, navigate]);
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
@@ -61,9 +52,14 @@ const RegisterPage: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
-
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/projects");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -126,14 +122,14 @@ const RegisterPage: React.FC = () => {
 
         navigate("/verify-email", { state: { userEmail: formData.email } });
       } catch (error) {
-        toast.error(error?.response?.data.message);
+        toast.error(error?.response?.data.message || "Registration failed");
       } finally {
         setIsLoading(false);
       }
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (isLoggedIn === undefined) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">

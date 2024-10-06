@@ -32,11 +32,11 @@ const Projects: React.FC = () => {
   if (loading) return <LoadingSpinner />;
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div className="text-red-500">Error: {error.message}</div>;
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg pb-4 shadow">
+    <div className="bg-white rounded-lg shadow-sm">
       <ProjectsTopBar />
       <ProjectsGrid />
     </div>

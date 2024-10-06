@@ -3,9 +3,9 @@ import ProfileSidebar from "./ProfileSidebar";
 
 const ProfileLayout = () => {
   return (
-    <div className="grid grid-cols-[220px,_1fr] gap-4 ">
+    <div className="flex">
       <ProfileSidebar />
-      <main className="flex-1 px-2 py-4">
+      <main className="flex-1 ml-0 lg:ml-60 p-6">
         <Outlet />
       </main>
     </div>

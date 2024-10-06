@@ -5,16 +5,18 @@ import { useNavigate } from "react-router-dom";
 
 import ProjectDetails from "@/components/Project/ProjectDetails";
 import ProjectChangelog from "@/components/Project/ProjectChangelog";
+import { useEffect } from "react";
 
 const ProjectOverview = () => {
   const navigate = useNavigate();
 
   const { project } = useSelector((state: RootState) => state.projectDetails);
 
-  if (!project) {
-    navigate("/projects");
-    return null;
-  }
+  useEffect(() => {
+    if (!project) {
+      navigate("/projects");
+    }
+  }, [project, navigate]);
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 lg:space-y-0 lg:flex lg:gap-6">

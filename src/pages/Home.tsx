@@ -1,28 +1,21 @@
 import { Link } from "react-router-dom";
-import useAuth from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
 
 const Home = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuth();
-  const [loading, setLoading] = useState(true);
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   useEffect(() => {
-    // Wait for isLoggedIn to be determined
-    if (isLoggedIn !== undefined) {
-      setLoading(false);
-      if (isLoggedIn) {
-        navigate("/projects");
-      }
+    if (isLoggedIn) {
+      navigate("/projects");
     }
   }, [isLoggedIn, navigate]);
-
-  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="flex flex-col h-full">

@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-
-import { AppDispatch } from "../app/store";
-
-import { login } from "@/apis/authApi";
-
-import { isEmail, isPasswordStrong } from "@/util/formValidations";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import resendOTP from "@/apis/resendOTP";
+import { AppDispatch, RootState } from "../app/store";
 import { loginFulfilled } from "@/app/features/auth/authSlice";
-import useAuth from "@/hooks/useAuth";
+
+import { login } from "@/apis/authApi";
+import resendOTP from "@/apis/resendOTP";
+
+import { isEmail, isPasswordStrong } from "@/util/formValidations";
+
 import LoadingSpinner from "../components/LoadingSpinner";
 
 interface LoginFormData {
@@ -38,29 +37,23 @@ const validateField = (
   }
 };
 
-const Login = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Wait for isLoggedIn to be determined
-    if (isLoggedIn !== undefined) {
-      setLoading(false);
-      if (isLoggedIn) {
-        navigate("/projects");
-      }
-    }
-  }, [isLoggedIn, navigate]);
-
   const dispatch = useDispatch<AppDispatch>();
-  const [isResLoading, setIsResLoading] = useState(false);
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState<LoginFormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/projects");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -98,7 +91,7 @@ const Login = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      setIsResLoading(true);
+      setIsLoading(true);
 
       try {
         const response = await login(formData);
@@ -130,12 +123,12 @@ const Login = () => {
           }
         }
       } finally {
-        setIsResLoading(false);
+        setIsLoading(false);
       }
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (isLoggedIn === undefined) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">
@@ -191,9 +184,9 @@ const Login = () => {
             <button
               className="w-full py-2 text-white bg-black rounded"
               onClick={handleSubmit}
-              disabled={isResLoading}
+              disabled={isLoading}
             >
-              {isResLoading ? "Loging In..." : "Log In"}
+              {isLoading ? "Loging In..." : "Log In"}
             </button>
           </form>
           <p className="text-center text-gray-500">

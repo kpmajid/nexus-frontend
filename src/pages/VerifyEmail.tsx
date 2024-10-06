@@ -1,44 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-import useAuth from "@/hooks/useAuth";
-import resendOTP from "@/apis/resendOTP";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { verifyOtp } from "@/apis/authApi";
-
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
+import { RootState } from "@/app/store";
+import resendOTP from "@/apis/resendOTP";
+import { verifyOtp } from "@/apis/authApi";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
-  const isLoggedIn = useAuth();
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
-  const { userEmail } = location.state;
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { userEmail } = location.state as { userEmail: string };
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [error, setError] = useState<string | null>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   useEffect(() => {
-    // Wait for isLoggedIn to be determined
-    if (isLoggedIn !== undefined) {
-      setLoading(false);
-      if (isLoggedIn) {
-        navigate("/projects");
-      }
+    if (isLoggedIn) {
+      navigate("/projects");
     }
   }, [isLoggedIn, navigate]);
 
   useEffect(() => {
-    if (!userEmail.length) {
+    if (!userEmail) {
       navigate("/login");
     }
-  }, [navigate, userEmail.length]);
+  }, [navigate, userEmail]);
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
@@ -97,8 +92,12 @@ const VerifyEmail: React.FC = () => {
 
       setResendTimer(60);
       setCanResend(false);
+
+      toast.success("OTP resent successfully");
     } catch (error) {
       console.error("Error resending OTP:", error);
+
+      toast.error("Failed to resend OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -123,12 +122,14 @@ const VerifyEmail: React.FC = () => {
       }, 2000);
     } catch (error) {
       console.error("Error verifiying:", error);
+
+      toast.error("Failed to verify OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (isLoggedIn === undefined) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto px-8 relative">

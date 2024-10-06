@@ -18,10 +18,12 @@ import { useDebouncedCallback } from "use-debounce";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { searchUsers } from "@/apis/projectApi";
+import { searchUsers, inviteUsers } from "@/apis/projectApi";
 
 import UserListItem from "./InviteDialog/UserListItem";
 import SelectedUserItem from "./InviteDialog/SelectedUserItem";
+import { RootState } from "@/app/store";
+import { useSelector } from "react-redux";
 
 type User = {
   _id: string;
@@ -36,6 +38,9 @@ const InviteDialog: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
+
+  const { project } = useSelector((state: RootState) => state.projectDetails);
 
   const debouncedSearch = useDebouncedCallback(async (value: string) => {
     if (value.length > 2) {
@@ -79,11 +84,26 @@ const InviteDialog: React.FC = () => {
     [selectedUsers]
   );
 
-  const handleInvite = useCallback(() => {
-    console.log(`Inviting users:`, selectedUsers);
-    // Here you would send the invitations to the backend
-    setSelectedUsers([]);
-    setIsOpen(false);
+  const handleInvite = useCallback(async () => {
+    if (selectedUsers.length === 0) return;
+    if (!project) return;
+    setIsInviting(true);
+    const userIds = selectedUsers.map((user) => user._id);
+    try {
+      const { data, error } = await inviteUsers(project._id, userIds);
+      if (data) {
+        // Here you would send the invitations to the backend
+        setSelectedUsers([]);
+        setIsOpen(false);
+      } else if (error) {
+        console.error("Error inviting users:", error);
+        // Show an error message to the user
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    } finally {
+      setIsInviting(false);
+    }
   }, [selectedUsers]);
 
   const UserList = useMemo(() => {
@@ -161,8 +181,18 @@ const InviteDialog: React.FC = () => {
           )}
         </div>
         <DialogFooter>
-          <Button onClick={handleInvite} disabled={selectedUsers.length === 0}>
-            Send Invitation
+          <Button
+            onClick={handleInvite}
+            disabled={selectedUsers.length === 0 || isInviting}
+          >
+            {isInviting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Inviting...
+              </>
+            ) : (
+              "Send Invitation"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import api from "./axiosInstance";
 import errorHandle, { ApiError } from "./error";
+import { User } from "@/types/types";
 
 interface ApiResponse<T> {
   data?: T;
@@ -24,9 +25,21 @@ export const searchUsers = async (query: string) => {
     const response = await api.get(
       `/users/search?query=${encodeURIComponent(query)}`
     );
-    console.log(response.data)
+    console.log(response.data);
     return { data: response.data };
-    
+  } catch (error) {
+    const apiError = errorHandle(error as Error | AxiosError);
+    return { error: apiError };
+  }
+};
+
+export const inviteUsers = async (projectId: string, userIds: string[]) => {
+  try {
+    const response = await api.post("/projects/invite", {
+      projectId,
+      userIds,
+    });
+    return { data: response.data };
   } catch (error) {
     const apiError = errorHandle(error as Error | AxiosError);
     return { error: apiError };
@@ -60,11 +73,26 @@ export const createProject = async (projectDetails: {
   }
 };
 
-export const fetchProjectDetails = async (id: string) => {
-  try {
-    const response = await api.get(`/projects/${id}`);
+interface Project {
+  _id?: string;
+  title: string;
+  description: string;
+  status?: string;
+  startDate: Date;
+  endDate: Date;
+  teamLead: string | User;
+  teamMembers?: (string | User)[];
+}
 
-    return response;
+export const fetchProjectDetails = async (
+  id: string
+): Promise<Project | ApiError> => {
+  try {
+    console.log("fetchProjectDetails");
+    const response = await api.get(`/projects/${id}`);
+    console.log(response);
+
+    return response.data.projectDetails;
   } catch (error) {
     const err: Error = error as Error;
     return errorHandle(err);

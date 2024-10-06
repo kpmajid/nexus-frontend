@@ -1,15 +1,8 @@
 import { useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  faTasks,
-  faDatabase,
-  faChartBar,
-  faUserCircle,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { Info, ListTodo, Layout, Database, Users } from "lucide-react";
 
 import { fetchProjectDetails } from "@/apis/projectApi";
 
@@ -35,18 +28,18 @@ const ProjectSidebar: React.FC = () => {
         if (!id) {
           return;
         }
-        const response = await fetchProjectDetails(id);
+        const project = await fetchProjectDetails(id);
 
-        if (response && response.data) {
-          const projectDetails = response.data.projectDetails;
-
+        if (project) {
           const role =
-            projectDetails.teamLead._id === currentUser?.id
+            project.teamLead._id === currentUser?.id
               ? "teamLead"
               : "teamMember";
 
-          dispatch(setProjectDetails(projectDetails));
+          dispatch(setProjectDetails(project));
           dispatch(setUserRole(role));
+        } else {
+          console.log("sample?");
         }
       } catch (error) {
         console.log(error);
@@ -58,81 +51,40 @@ const ProjectSidebar: React.FC = () => {
 
   if (!project) return <LoadingSpinner />;
 
+  const navItems = [
+    { to: `/${id}`, icon: Info, label: "Overview" },
+    { to: `/${id}/tasks`, icon: ListTodo, label: "Task" },
+    { to: `/${id}/board`, icon: Layout, label: "Board" },
+    { to: `/${id}/database`, icon: Database, label: "Database" },
+    { to: `/${id}/members`, icon: Users, label: "Members" },
+  ];
+
   return (
-    <div className="bg-gray-50 text-black h-screen p-4">
-      <nav>
+    <aside className="bg-white shadow-sm h-[calc(100vh-4rem)] w-60 fixed left-0 top-16 p-4 hidden lg:block">
+      <ProjectSelect project={project} />
+      <nav className="mt-4">
         <ul className="space-y-2">
-          <li>
-            <ProjectSelect project={project} />
-          </li>
-          <li>
-            <NavLink
-              to={`/${id}`}
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
-              Overview
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={`/${id}/tasks`}
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faTasks} className="mr-2" />
-              Task
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={`/${id}/board`}
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faChartBar} className="rotate-90 mr-2" />
-              Board
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={`/${id}/database`}
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faDatabase} className="mr-2" />
-              Database
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={`/${id}/members`}
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faUserCircle} className="mr-2" />
-              Members
-            </NavLink>
-          </li>
+          {navItems.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                end={item.to === `/${id}`}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-2 rounded-md transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 export default ProjectSidebar;

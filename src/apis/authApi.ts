@@ -31,7 +31,7 @@ export const refreshAccessToken = async () => {
   try {
     const response = await api.get("/auth/refresh-token");
     localStorage.setItem("accessToken", response.data.accessToken);
-    return response;
+    return response.data;
   } catch (error) {
     const err: Error = error as Error;
     console.log(err);

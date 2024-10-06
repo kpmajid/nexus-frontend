@@ -19,6 +19,7 @@ import ProjectOverview from "@/components/Project/ProjectOverview.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
 import ProfileChangePasswordSection from "@/components/Profile/ProfileChangePasswordSection.tsx";
 import ProjectMembers from "@/components/Project/ProjectMembers/ProjectMembers.tsx";
+import ProjectTasks from "@/components/Project/ProjectTasks/ProjectTasks.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,11 +32,11 @@ const router = createBrowserRouter([
       },
       {
         path: "register",
-        element: <RegisterPage />,
+        element: <RegisterPage />,//
       },
-      { path: "login", element: <Login /> },
-      { path: "verify-email", element: <VerifyEmail /> },
-      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "login", element: <Login /> },//
+      { path: "verify-email", element: <VerifyEmail /> },//
+      { path: "forgot-password", element: <ForgotPassword /> },//
       { path: "reset-password", element: <ResetPassword /> },
       {
         element: <RequireAuth />,
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <ProjectOverview />,
+              },
+              {
+                path: "tasks",
+                element: <ProjectTasks />,
               },
               {
                 path: "members",

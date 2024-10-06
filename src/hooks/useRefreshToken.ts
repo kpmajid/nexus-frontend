@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { loginFulfilled, logoutFulfilled } from "@/app/features/auth/authSlice";
 import { refreshAccessToken } from "@/apis/authApi";
@@ -14,16 +14,23 @@ interface DecodedToken {
 
 const useRefreshToken = () => {
   const dispatch = useDispatch();
+  const refreshingRef = useRef(false);
 
   useEffect(() => {
     const refreshToken = async () => {
-      try {
-        const response = await refreshAccessToken();
-        const decoded: DecodedToken = jwtDecode(response?.data.accessToken);
-        const { userId, name, email } = decoded;
-        const avatar = response?.data.avatar;
+      if (refreshingRef.current) return;
+      refreshingRef.current = true;
 
-        if (!userId || !name || !email || !avatar) {
+      try {
+        const data = await refreshAccessToken();
+        if (!data) {
+          return;
+        }
+        const decoded: DecodedToken = jwtDecode(data.accessToken);
+        const { userId, name, email } = decoded;
+        const avatar = data.avatar | "";
+
+        if (!userId || !name || !email) {
           throw new Error(
             "Decoded token does not contain required user information."
           );
@@ -44,10 +51,15 @@ const useRefreshToken = () => {
         );
 
         dispatch(logoutFulfilled());
+      } finally {
+        refreshingRef.current = false;
       }
     };
-
     refreshToken();
+
+    const intervalId = setInterval(refreshToken, 14 * 60 * 1000); // Refresh every 14 minutes
+
+    return () => clearInterval(intervalId);
   }, [dispatch]);
 };
 

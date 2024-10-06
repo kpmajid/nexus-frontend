@@ -1,42 +1,37 @@
 import { NavLink } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { User, Lock } from "lucide-react";
 
 const ProfileSidebar = () => {
+  const navItems = [
+    { to: "/profile", icon: User, label: "General" },
+    { to: "/profile/change-password", icon: Lock, label: "Change Password" },
+  ];
+
   return (
-    <div className="bg-gray-50 text-black h-screen p-4">
+    <aside className="bg-white shadow-sm h-[calc(100vh-4rem)] w-60 fixed left-0 top-16 p-4 hidden lg:block">
       <nav>
         <ul className="space-y-2">
-          <li>
-            <NavLink
-              to="/profile"
-              end
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faUser} className="mr-2" />
-              General
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/profile/change-password"
-              className={({ isActive }) =>
-                `block rounded p-2 ${
-                  isActive ? "bg-gray-200" : "hover:bg-gray-200"
-                }`
-              }
-            >
-              <FontAwesomeIcon icon={faLock} className="mr-2" />
-              Change Password
-            </NavLink>
-          </li>
+          {navItems.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                end={item.to === "/profile"}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-2 rounded-md transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 export default ProfileSidebar;
